@@ -65,10 +65,17 @@ func main() {
 	}
 	fmt.Printf("[%s] Successfully connected to database\n", time.Now().Format(time.RFC3339))
 
+	// Create uuid-ossp extension if it doesn't exist
+	_, err = db.Exec(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`)
+	if err != nil {
+		fmt.Printf("[%s] Error creating uuid-ossp extension: %v\n", time.Now().Format(time.RFC3339), err)
+		return
+	}
+
 	// Create subscriptions table if it doesn't exist
 	_, err = db.Exec(`
 		CREATE TABLE IF NOT EXISTS subscriptions (
-			id TEXT PRIMARY KEY,
+			id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
 			subscription JSONB NOT NULL
 		)
 	`)
